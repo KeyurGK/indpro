@@ -3,6 +3,8 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const categoryRoutes = require("./routes/categoryRoutes")
+const taskRoutes = require("./routes/tasksRoutes")
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.use(cors({ origin: "*", credentials: true })); // Adjust origin as needed
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/master/category",categoryRoutes);
+app.use("/api/tasks",taskRoutes)
 
 // Root Endpoint
 app.get("/", (req, res) => {

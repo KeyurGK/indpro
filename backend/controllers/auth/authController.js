@@ -41,44 +41,83 @@ const accountSignup = async (req, res) => {
 
 // User Login Controller
 const accountLogin = async (req, res) => {
-    const { emailId, password } = req.body;
-  
-    try {
+  const { emailId, password } = req.body;
+
+  try {
       const loginQuery = `SELECT * FROM USERS WHERE emailId = $1`;
       const values = [emailId];
-  
+
       const loginResponse = await pool.query(loginQuery, values);
-  
+
       if (loginResponse.rows.length === 0) {
-        return res.status(401).json({success:false, error: "Invalid credentials" });
+          return res.status(401).json({ success: false, error: "Invalid credentials" });
       }
-  
+
       const user = loginResponse.rows[0];
-  
+
       // Verify hashed password
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) {
-        return res.status(401).json({success:false, error: "Incorrect password" });
+          return res.status(401).json({ success: false, error: "Incorrect password" });
       }
-  
+
       // Generate JWT tokens
       const accessToken = generateAccessToken(user);
       const refreshToken = generateRefreshToken(user);
-  
+
+      // Store refresh token in the database
+      const updateTokenQuery = `UPDATE USERS SET refreshToken = $1 WHERE id = $2`;
+      await pool.query(updateTokenQuery, [refreshToken, user.id]);
+
       // Send refresh token in HTTP-only, Secure cookie
       res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,  // Set to false in development if using Postman
-        sameSite: "Strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          httpOnly: true,
+          secure: true, // Set to false in development if using Postman
+          sameSite: "Strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
-  
+
       // Send access token in response
-      res.status(200).json({success:true, message: "Login successful", accessToken });
-    } catch (error) {
+      res.status(200).json({ success: true, message: "Login successful", accessToken });
+  } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
+  }
+};
 
-module.exports = { accountSignup, accountLogin };
+
+//Generate a new access token 
+const refreshAccessToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(403).json({ success: false, error: "Refresh token missing" });
+    }
+
+    // Verify refresh token
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ success: false, error: "Invalid refresh token" });
+      }
+
+      // Check if refresh token exists in the database
+      const tokenQuery = `SELECT * FROM USERS WHERE id = $1 AND refreshToken = $2`;
+      const result = await pool.query(tokenQuery, [decoded.id, refreshToken]);
+
+      if (result.rows.length === 0) {
+        return res.status(403).json({ success: false, error: "Refresh token not valid" });
+      }
+
+      // Generate new access token using your existing service
+      const newAccessToken = generateAccessToken(result.rows[0]);
+
+      res.status(200).json({ success: true, accessToken: newAccessToken });
+    });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+};
+
+
+module.exports = { accountSignup, accountLogin,refreshAccessToken };

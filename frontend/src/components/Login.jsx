@@ -51,7 +51,7 @@ if(loginResponse?.success){
   toast.success(loginResponse?.message, { position: "top-right", autoClose: 3000 });
 
   setTimeout(() => {
-    navigate("/dashboard");
+    navigate("/home");
   }, 3000);
 }
      

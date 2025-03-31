@@ -70,7 +70,28 @@ export const accountSignUp = createAsyncThunk(
     }
   );
 
-
+//refresh toekn slice
+export const refreshAccessToken = createAsyncThunk(
+    "account/refreshAccessToken",
+    async (_, { rejectWithValue }) => {
+      try {
+        const response = await axios.post(
+          `${API_KEY}/auth/refresh-token`,
+          {}, // No need to send body, as the refresh token is in cookies
+          {
+            withCredentials: true, // Ensure cookies are sent
+          }
+        );
+  
+        // Store the new access token
+        //localStorage.setItem("accessToken", response.data.token); // Fix key name to match backend response
+  
+        return response.data.token;
+      } catch (error) {
+        return rejectWithValue(error.response?.data || "Unable to refresh token");
+      }
+    }
+  );
 
 const AccountAuthSlice = createSlice({
   name: "Account",

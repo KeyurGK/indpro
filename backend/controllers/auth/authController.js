@@ -95,24 +95,25 @@ const refreshAccessToken = async (req, res) => {
     }
 
     // Verify refresh token
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ success: false, error: "Invalid refresh token" });
-      }
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return res.status(403).json({ success: false, error: "Invalid refresh token" });
+    }
 
-      // Check if refresh token exists in the database
-      const tokenQuery = `SELECT * FROM USERS WHERE id = $1 AND refreshToken = $2`;
-      const result = await pool.query(tokenQuery, [decoded.id, refreshToken]);
+    // Check if refresh token exists in the database
+    const tokenQuery = `SELECT * FROM USERS WHERE id = $1 AND refreshToken = $2`;
+    const result = await pool.query(tokenQuery, [decoded.id, refreshToken]);
 
-      if (result.rows.length === 0) {
-        return res.status(403).json({ success: false, error: "Refresh token not valid" });
-      }
+    if (result.rows.length === 0) {
+      return res.status(403).json({ success: false, error: "Refresh token not valid" });
+    }
 
-      // Generate new access token using your existing service
-      const newAccessToken = generateAccessToken(result.rows[0]);
+    // Generate new access token
+    const newAccessToken = generateAccessToken(result.rows[0]);
 
-      res.status(200).json({ success: true, accessToken: newAccessToken });
-    });
+    res.status(200).json({ success: true, accessToken: newAccessToken });
   } catch (error) {
     console.error("Error refreshing token:", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });

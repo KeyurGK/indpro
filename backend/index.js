@@ -14,7 +14,7 @@ app.use(cookieParser()); // Enable cookie parsing
 app.use(
   cors({
     // origin: "http://localhost:5173", // Update this to match your frontend URL
-    origin:"https://indpro.vercel.app/",
+    origin:"*",
     credentials: true,
   })
 );

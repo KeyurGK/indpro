@@ -99,17 +99,17 @@ const TaskModal = ({ isOpen, onClose, task,taskId }) => {
             type="checkbox"
             checked={editedTask.completed}
             onChange={(e) => setEditedTask((prev) => ({ ...prev, completed: e.target.checked }))}
-            className="mr-2"
+            className="mr cursor-pointer"
           />
           <label>Mark as Completed</label>
         </div>
 
         {/* Buttons */}
         <div className="flex justify-end space-x-3">
-          <button onClick={onClose} className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500">
+          <button onClick={onClose} className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 cursor-pointer">
             Close
           </button>
-          <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+          <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer">
             Save Changes
           </button>
         </div>

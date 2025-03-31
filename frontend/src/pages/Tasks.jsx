@@ -113,14 +113,14 @@ const Tasks = () => {
               <div className="flex space-x-2">
                 {!task?.completed && (
                   <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700 cursor-pointer"
                     onClick={() => markTaskAsComplete(task?.taskid, task?.title, task?.description)}
                   >
                     Mark as Complete
                   </button>
                 )}
                 <button
-                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700"
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700 cursor-pointer"
                   onClick={() => deleteTask(task?.taskid)}
                 >
                   Delete

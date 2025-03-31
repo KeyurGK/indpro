@@ -9,10 +9,10 @@ const AddCategoryModal = ({ newCategory, setNewCategory, setIsModalOpen, handleA
       setError("Category name is required.");
       return;
     }
-    if (!/^[A-Za-z\s]+$/.test(newCategory)) {
-      setError("Only alphabets are allowed.");
-      return;
-    }
+    // if (!/^[A-Za-z\s ]+$/.test(newCategory)) {
+    //   setError("Only alphabets are allowed.");
+    //   return;
+    // }
 
     setError(""); // Clear error if valid
     handleAddCategory();

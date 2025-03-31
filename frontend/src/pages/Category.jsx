@@ -31,8 +31,8 @@ const Category = () => {
       toast.error("Category name is required.", { position: "top-right", autoClose: 3000 });
       return;
     }
-    if (!/^[A-Za-z]+$/.test(newCategory)) {
-      toast.error("Only alphabets are allowed.", { position: "top-right", autoClose: 3000 });
+ if (!/^[A-Za-z\s ]+$/.test(newCategory)) {
+      setError("Only alphabets are allowed.");
       return;
     }
 
@@ -59,7 +59,7 @@ const Category = () => {
     <div className="p-6">
       <button
         onClick={() => setIsModalOpen(true)}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded cursor-pointer"
       >
         Add Category
       </button>

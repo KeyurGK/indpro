@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Menu, X } from "lucide-react"; // Import icons for mobile menu
-
+import Cookies from "js-cookie";
 const MainPage = () => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
@@ -20,8 +20,11 @@ const MainPage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    Cookies.remove("access");
+    Cookies.remove("refreshToken");
     sessionStorage.removeItem("profile");
     sessionStorage.removeItem("isAuthenticated")
+   
     navigate("/"); // Redirect to login page
   };
 

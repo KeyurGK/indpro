@@ -1,11 +1,11 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { refreshAccessToken } from "./AuthReducer/AuthSlice";
-
+import { API_KEY } from "./ApiKey/api";
 
 const axiosInstance = axios.create({
   baseURL: API_KEY,
-  withCredentials: true, // Ensure cookies are sent with requests
+  withCredentials: true, // Ensure cookies are sent
 });
 
 let isRefreshing = false;
@@ -45,7 +45,6 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Dynamically import store to avoid circular dependency
         const { store } = await import("./store");
         const refreshResponse = await store.dispatch(refreshAccessToken()).unwrap();
 
@@ -54,9 +53,9 @@ axiosInstance.interceptors.response.use(
 
           // Update the access token in cookies
           Cookies.set("access", newAccessToken, {
-            path: "/",
-            secure: true,
-            sameSite: "Strict",
+            // path: "/",
+            // secure: process.env.NODE_ENV === "production", // Only secure in production
+            // sameSite: "Strict",
           });
 
           // Retry all failed requests with new token
@@ -70,6 +69,14 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         failedRequestsQueue.forEach((req) => req.reject(refreshError));
         failedRequestsQueue = [];
+        
+        // If refresh token is invalid, clear everything & logout
+        if (refreshError.response?.status === 403) {
+          Cookies.remove("access");
+          Cookies.remove("refreshToken");
+          window.location.href = "/login"; // Redirect user to login page
+        }
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

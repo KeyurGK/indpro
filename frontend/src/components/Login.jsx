@@ -42,11 +42,13 @@ const Login = () => {
       // Store accessToken in cookies (refreshToken is set by the backend in HTTP-only cookies)
     
 if(loginResponse?.success){
-    Cookies.set("auth", accessToken, {
-        expires: 1, // 1 day expiry
+    Cookies.set("access", accessToken, {
+        //expires: 1, // 1 day expiry
+        // path: "/",
         path: "/",
-        secure: true,
-        sameSite: "Strict",
+                secure: true,
+                sameSite: "Strict",
+                domain: "localhost",
       });
   toast.success(loginResponse?.message, { position: "top-right", autoClose: 3000 });
 

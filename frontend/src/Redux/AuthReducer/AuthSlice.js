@@ -22,9 +22,13 @@ export const accountLogin = createAsyncThunk(
       try {
         const response = await axios.post(`${API_KEY}/auth/login`, {
           emailId, password
-        }, {
-          headers: { "Content-Type": "application/json" },
-        });
+        },  {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 //   console.log(response,'inside slice');
 //   if(response.data.success){
 //     await Cookies.set("accessToken", response.data.accessToken, { 
@@ -85,8 +89,8 @@ export const refreshAccessToken = createAsyncThunk(
   
         // Store the new access token
         //localStorage.setItem("accessToken", response.data.token); // Fix key name to match backend response
-  
-        return response.data.token;
+        console.log(response,'token responseee')
+        return response;
       } catch (error) {
         return rejectWithValue(error.response?.data || "Unable to refresh token");
       }

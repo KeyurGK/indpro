@@ -71,11 +71,12 @@ const accountLogin = async (req, res) => {
 
       // Send refresh token in HTTP-only, Secure cookie
       res.cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: true, // Set to false in development if using Postman
-          sameSite: "Strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production", // ✅ Secure only in production
+        sameSite: "Strict",
+        // path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
       // Send access token in response
       res.status(200).json({ success: true, message: "Login successful", accessToken });
@@ -90,6 +91,8 @@ const accountLogin = async (req, res) => {
 const refreshAccessToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken,'refresh')
+    
     if (!refreshToken) {
       return res.status(403).json({ success: false, error: "Refresh token missing" });
     }
@@ -98,6 +101,7 @@ const refreshAccessToken = async (req, res) => {
     let decoded;
     try {
       decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      console.log(decoded,'decoded')
     } catch (err) {
       return res.status(403).json({ success: false, error: "Invalid refresh token" });
     }

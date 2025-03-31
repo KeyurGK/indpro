@@ -4,9 +4,9 @@ const { loadCategories, addCategory, updateCategory } = require("../controllers/
 const router = express.Router();
 
 
-router.get("/all",verifyAccessToken,loadCategories);
-router.post("/add",verifyAccessToken,addCategory);
-router.put("/update",verifyAccessToken,updateCategory);
+router.get("/all",loadCategories);
+router.post("/add",addCategory);
+router.put("/update",updateCategory);
 
 
 module.exports = router;

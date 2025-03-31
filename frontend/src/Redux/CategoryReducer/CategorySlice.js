@@ -13,29 +13,36 @@ const initialState = {
 
 // Fetch Category List
 export const GetCategoryList = createAsyncThunk(
-  "category/GetCategoryList",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get("/category/all");
-      return response.data.response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message || "An unknown error occurred");
+    "category/GetCategoryList",
+    async (token, { rejectWithValue }) => {
+      try {
+        const response = await axiosInstance.get("master/category/all", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (response.data.success) {
+          return response.data.data;
+        }
+      } catch (error) {
+        return rejectWithValue(error.response?.data || error.message || "An unknown error occurred");
+      }
     }
-  }
-);
+  );
 
 // Add Category
 export const AddCategory = createAsyncThunk(
-  "category/AddCategory",
-  async (categoryData, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post("/category/add", categoryData);
-      return response.data.response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message || "An unknown error occurred");
+    "category/AddCategory",
+    async (payload, { rejectWithValue }) => {
+      try {
+        const response = await axiosInstance.post("master/category/add", payload);
+        return response.data.response;
+      } catch (error) {
+        return rejectWithValue(error.response?.data || error.message || "An unknown error occurred");
+      }
     }
-  }
-);
+  );
 
 // Update Category
 export const UpdateCategory = createAsyncThunk(

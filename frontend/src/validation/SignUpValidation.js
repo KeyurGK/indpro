@@ -1,4 +1,4 @@
-export const validateName = (name) => /^[A-Za-z]+$/.test(name);
+export const validateName = (name) => /^[A-Za-z ]+$/.test(name);
 
 export const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 

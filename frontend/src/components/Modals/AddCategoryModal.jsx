@@ -9,7 +9,7 @@ const AddCategoryModal = ({ newCategory, setNewCategory, setIsModalOpen, handleA
       setError("Category name is required.");
       return;
     }
-    if (!/^[A-Za-z]+$/.test(newCategory)) {
+    if (!/^[A-Za-z\s]+$/.test(newCategory)) {
       setError("Only alphabets are allowed.");
       return;
     }
@@ -19,7 +19,7 @@ const AddCategoryModal = ({ newCategory, setNewCategory, setIsModalOpen, handleA
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-30">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-40 bg-opacity-30 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-xl w-96 relative">
         {/* Close Button at Top Right */}
         <button

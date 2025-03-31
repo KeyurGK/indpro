@@ -8,7 +8,7 @@ const initialState = {
   isAuthenticated: sessionStorage.getItem("isAuthenticated") === "true",
   token: null,
   successMessage: null,
-  AdminprofileModalOpen: false,
+ 
 };
 
 // Fetch Category List
@@ -61,9 +61,7 @@ const CategorySlice = createSlice({
   name: "Category",
   initialState,
   reducers: {
-    toggleProfileModal: (state) => {
-      state.AdminprofileModalOpen = !state.AdminprofileModalOpen;
-    },
+   
     logout: (state) => {
       state.isAuthenticated = false;
       state.token = null;

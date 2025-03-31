@@ -11,25 +11,7 @@ const initialState = {
   AdminprofileModalOpen: false,
 };
 
-// Fetch Category List
-// export const GetTaskList = createAsyncThunk(
-//     "task/GetTaskList",
-//     async (token, { rejectWithValue }) => {
-//       try {
-//         const response = await axiosInstance.get("tasks/all", {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-  
-//         if (response.data.success) {
-//           return response.data.data;
-//         }
-//       } catch (error) {
-//         return rejectWithValue(error.response?.data || error.message || "An unknown error occurred");
-//       }
-//     }
-//   );
+
 export const GetTaskList = createAsyncThunk(
   "task/GetTaskList",
   async ({ token, search = "", completed = "" }, { rejectWithValue }) => {
@@ -91,11 +73,18 @@ export const UpdateTask = createAsyncThunk(
 //delate
 export const DeleteTask = createAsyncThunk(
   "tasks/DeleteTask",
-  async ({ taskId }, { rejectWithValue }) => {
+  async ({ token,taskId }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete(`/tasks/delete/${taskId}`);
 
-      return response.data; // Returning success message
+      const response = await axiosInstance.delete(`/tasks/delete/${taskId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+// console.log(response,'slice delete')
+      return response; // Returning success message
     } catch (error) {
       return rejectWithValue(
         error.response?.data || error.message || "An unknown error occurred"
@@ -154,10 +143,8 @@ const TaskSlice = createSlice({
       })
       .addCase(UpdateTask.fulfilled, (state, action) => {
         state.loading = false;
-        state.taskList = state.categoryList.map((category) =>
-          category.id === action.payload.id ? action.payload : category
-        );
-        state.successMessage = "Category updated successfully!";
+       
+        state.successMessage = "Task updated successfully!";
       })
       .addCase(UpdateTask.rejected, (state, action) => {
         state.loading = false;
@@ -168,11 +155,8 @@ const TaskSlice = createSlice({
         state.loading = true;
       })
       .addCase(DeleteTask.fulfilled, (state, action) => {
-        state.loading = false;
-        state.taskList = state.categoryList.map((category) =>
-          category.id === action.payload.id ? action.payload : category
-        );
-        state.successMessage = "Category updated successfully!";
+        state.loading = false;       
+        state.successMessage = "Task deleted successfully!";
       })
       .addCase(DeleteTask.rejected, (state, action) => {
         state.loading = false;

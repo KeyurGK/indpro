@@ -1,7 +1,7 @@
 const pool = require("../../config/db");
 const { generateAccessToken, generateRefreshToken } = require("../../services/jwtService");
 const { hashPassword, comparePassword } = require("../../services/passwordService");
-
+const jwt = require("jsonwebtoken")
 // User Signup Controller
 const accountSignup = async (req, res) => {
   const { firstName, lastName, emailId, password } = req.body;
@@ -79,7 +79,7 @@ const accountLogin = async (req, res) => {
     });
 
       // Send access token in response
-      res.status(200).json({ success: true, message: "Login successful", accessToken });
+      res.status(200).json({ success: true, message: "Login successful", accessToken,user:user });
   } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -91,7 +91,7 @@ const accountLogin = async (req, res) => {
 const refreshAccessToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-    console.log(refreshToken,'refresh')
+    // console.log(refreshToken,'refresh')
     
     if (!refreshToken) {
       return res.status(403).json({ success: false, error: "Refresh token missing" });
@@ -100,8 +100,10 @@ const refreshAccessToken = async (req, res) => {
     // Verify refresh token
     let decoded;
     try {
+      // console.log("inside")
+      
+      // console.log(jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET),'decoded');
       decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-      console.log(decoded,'decoded')
     } catch (err) {
       return res.status(403).json({ success: false, error: "Invalid refresh token" });
     }

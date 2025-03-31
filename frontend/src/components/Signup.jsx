@@ -5,6 +5,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+
 import Cookies from "js-cookie"; 
 import { validateSignupForm } from "../validation/SignUpValidation";
 import { accountSignUp } from "../Redux/AuthReducer/AuthSlice";
@@ -43,12 +45,13 @@ const Signup = () => {
 
     try {
       const signUpResponse = await dispatch(accountSignUp(formData)).unwrap();
-      console.log(signUpResponse,'signup')
-      if(signUpResponse.success){
-        toast.success(signUpResponse?.message,{
+      // console.log(signUpResponse,'signup')
+      if (signUpResponse.success) {
+        toast.success(signUpResponse?.message, {
           position: "top-right",
-          autoClose: 3000,
-        })
+          autoClose: 1500,
+          onClose: () => navigate("/"), // Navigate only after toast closes
+        });
       }
      
 
@@ -124,6 +127,10 @@ const Signup = () => {
             Sign Up
           </button>
         </form>
+        <p className="text-center text-gray-600 mt-4">
+          Already have an account ?
+          <Link to="/" className="text-blue-600 hover:underline ml-1">Login</Link>
+        </p>
       </div>
       <ToastContainer />
     </div>

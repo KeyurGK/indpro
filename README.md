@@ -1,10 +1,10 @@
-# Task Manager Application
+# Flow Task
 
 ## Overview
-The **Task Manager Application** is a web-based task management system that allows users to efficiently create, manage, and categorize tasks. The application features user authentication, task organization, and category management.
+The **Flow Task** is a web-based task management system that allows users to efficiently create, manage, and categorize tasks. The application features user authentication, task organization, and category management.
 
 ## Features
-- **User Authentication**: Users can sign up, log in, and access their tasks.
+- **User Authentication**: Users can sign up, log in, and access their tasks. The concept of Refresh and access token is used.
 - **Dashboard**: A user-friendly interface where users can navigate to different sections.
 - **Task Management**: Create, update, delete, and mark tasks as completed.
 - **Category Management**: Users can organize their different categories.

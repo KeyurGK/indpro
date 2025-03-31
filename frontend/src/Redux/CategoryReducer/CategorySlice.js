@@ -37,7 +37,7 @@ export const AddCategory = createAsyncThunk(
     async (payload, { rejectWithValue }) => {
       try {
         const response = await axiosInstance.post("master/category/add", payload);
-        return response.data.response;
+        return response.data;
       } catch (error) {
         return rejectWithValue(error.response?.data || error.message || "An unknown error occurred");
       }

@@ -1,130 +1,289 @@
+// import { useEffect, useState } from "react";
+
+// import { useNavigate } from "react-router-dom";
+// import { FaSearch } from "react-icons/fa";
+// import AddTaskModal from "../components/Modals/AddTaskModal";
+// import TaskModal from "../components/Modals/TaskModal";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import useCookie from "../hooks/useCookie";
+// import { useDispatch, useSelector } from "react-redux";
+// import { DeleteTask, GetTaskList, UpdateTask } from "../Redux/TaskReducer/TaskSlice";
+
+// const Tasks = () => {
+//   const token = useCookie("access");
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   const { taskList, loading, error } = useSelector((state) => state.Task);
+
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [selectedStatus, setSelectedStatus] = useState("");
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [selectedTask, setSelectedTask] = useState(null);
+//   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+// const [taskId,setTaskId]=useState(null)
+//   useEffect(() => {
+//     if (token) {
+//       dispatch(GetTaskList({ token, search: searchQuery, completed: selectedStatus }));
+//     }
+//   }, [token, searchQuery, selectedStatus, dispatch]);
+
+//   const markTaskAsComplete = async (taskId,title,description) => {
+//     try {
+//       await dispatch(UpdateTask({ token, taskId,title,description, completed: true })).unwrap();
+//       dispatch(GetTaskList({ token, search: searchQuery, completed: selectedStatus }));
+//     } catch (error) {
+//       console.error("Error updating task:", error);
+//     }
+//   };
+  
+
+//   const deleteTask = (taskId) => {
+//     dispatch(DeleteTask({ token, taskId }))
+//       .then(() => dispatch(GetTaskList({ token, search: searchQuery, completed: selectedStatus })))
+//       .catch((error) => console.error("Error deleting task:", error));
+//   };
+
+//   return (
+//     <div className="h-screen flex flex-col p-6">
+//       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+//         <div className="flex space-x-4">
+//           <input
+//             type="text"
+//             placeholder="Search tasks..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="p-2 border rounded-md w-full md:w-auto"
+//           />
+//           <select
+//             value={selectedStatus}
+//             onChange={(e) => setSelectedStatus(e.target.value)}
+//             className="p-2 border rounded-md w-full md:w-auto cursor-pointer"
+//           >
+//             <option value="">All</option>
+//             <option value="true">Completed</option>
+//             <option value="false">Incomplete</option>
+//           </select>
+//           <button className="p-2 border rounded-md cursor-pointer">
+//             <FaSearch size={20} />
+//           </button>
+//         </div>
+//         <button
+//           onClick={() => setIsModalOpen(true)}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+//         >
+//           + Add Task
+//         </button>
+//       </div>
+
+//       <ul className="space-y-3">
+//         {loading ? (
+//           <p>Loading tasks...</p>
+//         ) : error ? (
+//           <p className="text-red-500">Error: {error}</p>
+//         ) : taskList?.length === 0 ? (
+//           <p>No tasks found.</p>
+//         ) : (
+//           taskList.map((task) => (
+//             <li
+//               key={task?.taskid}
+//               className={`p-4 border rounded-md shadow-sm flex justify-between items-center 
+//                 ${task?.completed ? "bg-green-200" : "bg-white"} transition-all`}
+//             >
+//               <div className="flex flex-col cursor-pointer" onClick={() => {
+//                 setTaskId(task?.taskid)
+//                 setSelectedTask(task);
+//                 setIsTaskModalOpen(true);
+//               }}>
+//                 <span className={task?.completed ? "line-through text-gray-500" : ""}>
+//                   {task?.title}
+//                 </span>
+//                 <span className="text-gray-600">({task?.category?.categoryName})</span>
+//               </div>
+              
+//               <div className="flex space-x-2">
+//                 {!task?.completed && (
+//                   <button
+//                     className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+//                     onClick={() => markTaskAsComplete(task?.taskid,task?.title,task?.description)}
+//                   >
+//                     Mark as Complete
+//                   </button>
+//                 )}
+//                 <button
+//                   className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700"
+//                   onClick={() => deleteTask(task?.taskid)}
+//                 >
+//                   Delete
+//                 </button>
+//               </div>
+//             </li>
+//           ))
+//         )}
+//       </ul>
+
+//       <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+//       {selectedTask && (
+//         <TaskModal
+//           isOpen={isTaskModalOpen}
+//           onClose={() => {
+//             setIsTaskModalOpen(false);
+//             setSelectedTask(null);
+//           }}
+//           task={selectedTask}
+//           taskId={taskId}
+//         />
+//       )}
+//       <ToastContainer/>
+//     </div>
+//   );
+// };
+
+// export default Tasks;
+
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-import { Menu, X } from "lucide-react";
 import AddTaskModal from "../components/Modals/AddTaskModal";
-import SearchModal from "../components/Modals/SearchModal";
+import TaskModal from "../components/Modals/TaskModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useCookie from "../hooks/useCookie";
+import { useDispatch, useSelector } from "react-redux";
+import { DeleteTask, GetTaskList, UpdateTask } from "../Redux/TaskReducer/TaskSlice";
 
 const Tasks = () => {
-  console.log("hiiiiii")
+  const token = useCookie("access");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [newTask, setNewTask] = useState({ title: "", description: "", category: "" });
-  const [firstName, setFirstName] = useState("John"); // Default user name
+
+  const { taskList, loading, error } = useSelector((state) => state.Task);
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskId, setTaskId] = useState(null);
 
   useEffect(() => {
-    setTasks([
-      { id: 1, title: "Task 1", completed: false, category: "Work" },
-      { id: 2, title: "Task 2", completed: true, category: "Personal" },
-    ]);
-  }, []);
+    if (token) {
+      dispatch(GetTaskList({ token, search: searchQuery, completed: selectedStatus }));
+    }
+  }, [token, searchQuery, selectedStatus, dispatch]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
-
-  const categories = ["Work", "Personal", "Health", "Finance"];
-  const statuses = ["Incomplete", "Complete"];
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setNewTask({ title: "", description: "", category: "" });
-  };
-
-  const handleOpenSearchModal = () => setIsSearchModalOpen(true);
-  const handleCloseSearchModal = () => setIsSearchModalOpen(false);
-
-  const handleChange = (e) => {
-    setNewTask({ ...newTask, [e.target.name]: e.target.value });
-  };
-
-  const handleAddTask = () => {
-    if (newTask.title && newTask.category) {
-      setTasks([...tasks, { id: tasks.length + 1, ...newTask, completed: false }]);
-      handleCloseModal();
-    } else {
-      alert("Title and category are required.");
+  const markTaskAsComplete = async (taskId, title, description) => {
+    try {
+      await dispatch(UpdateTask({ token, taskId, title, description, completed: true })).unwrap();
+      dispatch(GetTaskList({ token, search: searchQuery, completed: selectedStatus }));
+      toast.success("Task marked as completed!");
+    } catch (error) {
+      toast.error("Error updating task.");
     }
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    return (
-      (selectedCategory === "" || task.category === selectedCategory) &&
-      (selectedStatus === "" || (selectedStatus === "Complete" ? task.completed : !task.completed)) &&
-      (searchQuery === "" || task.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  });
+  const deleteTask = async (taskId) => {
+    try {
+      await dispatch(DeleteTask({ token, taskId })).unwrap();
+      dispatch(GetTaskList({ token, search: searchQuery, completed: selectedStatus }));
+      toast.success("Task deleted successfully!");
+    } catch (error) {
+      toast.error("Error deleting task.");
+    }
+  };
 
   return (
-    <div className="h-screen flex flex-col">
-      <header className="bg-white text-black py-4 px-6 flex justify-between items-center shadow-md w-full">
-        <h1 className="text-2xl font-bold">FlowTask</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-lg font-semibold hidden sm:block">{firstName}</span>
-          <button onClick={handleLogout} className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-            Logout
-          </button>
-          <button className="sm:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <X size={28} /> : <Menu size={28} />}
+    <div className="h-screen flex flex-col p-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+        <div className="flex space-x-4">
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 border rounded-md w-full md:w-auto"
+          />
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="p-2 border rounded-md w-full md:w-auto cursor-pointer"
+          >
+            <option value="">All</option>
+            <option value="true">Completed</option>
+            <option value="false">Incomplete</option>
+          </select>
+          <button className="p-2 border rounded-md cursor-pointer">
+            <FaSearch size={20} />
           </button>
         </div>
-      </header>
-
-      <div className="flex flex-1">
-        <aside className={`fixed inset-y-0 left-0 bg-white shadow-md p-6 w-64 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} sm:relative sm:translate-x-0 transition-transform duration-300 ease-in-out z-50`}>
-          <nav className="space-y-4">
-            <Link to="/home" className="block py-2 px-4 rounded-md hover:bg-gray-200">Dashboard</Link>
-            <Link to="/home/tasks" className="block py-2 px-4 rounded-md hover:bg-gray-200">Tasks</Link>
-            <Link to="/home/category" className="block py-2 px-4 rounded-md hover:bg-gray-200">Category</Link>
-          </nav>
-        </aside>
-
-        <main className="flex-1 p-6">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
-              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="p-2 border rounded-md w-full md:w-auto">
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-              <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="p-2 border rounded-md w-full md:w-auto">
-                <option value="">All Status</option>
-                {statuses.map((status) => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-              <button onClick={handleOpenSearchModal} className="p-2 border rounded-md w-full md:w-auto">
-                <FaSearch size={20} />
-              </button>
-            </div>
-            <button onClick={handleOpenModal} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full md:w-auto mt-2 md:mt-0">
-              + Add Task
-            </button>
-          </div>
-
-          <ul className="space-y-3">
-            {filteredTasks.map((task) => (
-              <li key={task.id} className="p-4 border rounded-md shadow-sm">
-                <span className={task.completed ? "line-through text-gray-500" : ""}>
-                  {task.title} ({task.category})
-                </span>
-              </li>
-            ))}
-          </ul>
-        </main>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          + Add Task
+        </button>
       </div>
 
-      <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} onAdd={handleAddTask} newTask={newTask} handleChange={handleChange} categories={categories} />
-      <SearchModal isOpen={isSearchModalOpen} onClose={handleCloseSearchModal} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <ul className="space-y-3">
+        {loading ? (
+          <p>Loading tasks...</p>
+        ) : error ? (
+          <p className="text-red-500">Error: {error}</p>
+        ) : taskList?.length === 0 ? (
+          <p>No tasks found.</p>
+        ) : (
+          taskList.map((task) => (
+            <li
+              key={task?.taskid}
+              className={`p-4 border rounded-md shadow-sm flex justify-between items-center 
+                ${task?.completed ? "bg-green-200" : "bg-white"} transition-all`}
+            >
+              <div className="flex flex-col cursor-pointer" onClick={() => {
+                setTaskId(task?.taskid);
+                setSelectedTask(task);
+                setIsTaskModalOpen(true);
+              }}>
+                <span className={task?.completed ? "line-through text-gray-500" : ""}>
+                  {task?.title}
+                </span>
+                <span className="text-gray-600">({task?.category?.categoryName})</span>
+              </div>
+              
+              <div className="flex space-x-2">
+                {!task?.completed && (
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+                    onClick={() => markTaskAsComplete(task?.taskid, task?.title, task?.description)}
+                  >
+                    Mark as Complete
+                  </button>
+                )}
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-700"
+                  onClick={() => deleteTask(task?.taskid)}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+
+      <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      {selectedTask && (
+        <TaskModal
+          isOpen={isTaskModalOpen}
+          onClose={() => {
+            setIsTaskModalOpen(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+          taskId={taskId}
+        />
+      )}
+      <ToastContainer />
     </div>
   );
 };

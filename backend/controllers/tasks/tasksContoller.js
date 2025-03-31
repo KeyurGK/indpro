@@ -5,7 +5,7 @@ const addTask = async (req, res) => {
     const { title, description, categoryId } = req.body; 
 
     try {
-        // Ensure the TASKS table exists
+        // Ensure the TASKS table exists (updated schema)
         const createTaskTableQuery = `
         CREATE TABLE IF NOT EXISTS TASKS (
             taskId SERIAL PRIMARY KEY,
@@ -47,10 +47,12 @@ const addTask = async (req, res) => {
     }
 };
 
+
+
 // Load All Tasks
 const loadTasks = async (req, res) => {
     try {
-        const { categoryId, completed, search } = req.query; // Extract query params
+        const { search, completed } = req.query; // Extract query params
         let filters = [];
         let values = [];
         let query = `
@@ -69,26 +71,22 @@ const loadTasks = async (req, res) => {
             JOIN CATEGORIES c ON t.categoryId = c.categoryId
         `;
 
-        // Apply filters based on query parameters
-        if (categoryId) {
-            filters.push(`c.categoryId = $${values.length + 1}`);
-            values.push(categoryId);
+        // Apply filters only if provided
+        if (search) {
+            filters.push(`LOWER(t.title) LIKE LOWER($${values.length + 1})`);
+            values.push(`%${search}%`);
         }
         if (completed !== undefined) {
             filters.push(`t.completed = $${values.length + 1}`);
             values.push(completed === "true"); // Convert string to boolean
         }
-        if (search) {
-            filters.push(`LOWER(t.title) LIKE LOWER($${values.length + 1})`);
-            values.push(`%${search}%`);
-        }
 
-        // Append WHERE clause if there are filters
+        // Append WHERE clause only if filters exist
         if (filters.length > 0) {
             query += ` WHERE ` + filters.join(" AND ");
         }
 
-        query += `;`; // Finalize query
+        query += ` ORDER BY t.createdAt DESC;`; // Sort by newest tasks first
 
         const result = await pool.query(query, values);
 
@@ -102,6 +100,7 @@ const loadTasks = async (req, res) => {
         return res.status(500).json({ success: false, error: "Internal Server Error" });
     }
 };
+
 
 
 // Update Task (Title, Description, Completed Status)
